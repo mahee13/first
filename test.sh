@@ -1,3 +1,1 @@
-touch file59
-
-date
+yum install ntp* -y
