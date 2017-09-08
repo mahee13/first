@@ -83,3 +83,31 @@ EOF
 echo "Mysql root password is: ${MYSQL_PASS}"
 echo "LAMP stack is isntalled successfully"
 
+
+#Download Wordpress
+wget http://wordpress.org/latest.tar.gz
+tar -xzvf latest.tar.gz
+
+wp_admin="fruit"
+wp_db="apple"
+wp_pass='ctrls@123'
+
+mysql -u "$MYSQL_ROOT" -p"$MYSQL_PASS" <<EOF
+SHOW DATABASES;
+CREATE DATABASE IF NOT EXISTS $wp_db;
+CREATE USER  $wp_admin@localhost;
+SET PASSWORD FOR $wp_admin@localhost= PASSWORD("$wp_pass");
+GRANT ALL PRIVILEGES ON $wp_db.* TO $wp_admin@localhost IDENTIFIED BY '$wp_pass';
+SHOW DATABASES;
+exit
+EOF
+
+#Setup the WordPress Configuration
+cp ~/wordpress/wp-config-sample.php ~/wordpress/wp-config.php
+sed -i -e "s/username_here/$wp_admin/g; s/database_name_here/$wp_db/g; s/password_here/$wp_pass/g" wordpress/wp-config.php
+
+#Copy the Files
+sudo cp -r ~/wordpress/* /var/www/html
+
+sudo service httpd restart
+
